@@ -1,23 +1,7 @@
-Spring Integration - Standalone Template (Using the File Adapter)
+Spring Integration - using Best Efforts 1PC transaction control
+JMS Queue -> Database persist
 ================================================================================
 
-This template includes a demonstration of Spring Integration's File support. The
-template includes commonly used components such as:
-
-* Transformers
-* Routers
-* Wire-taps (For logging)
-
-You can run the application by either
-
-* running the "Main" class from within STS (Right-click on Main class --> Run As --> Java Application)
-* or from the command line:
-    - mvn package
-    - mvn exec:java
-
---------------------------------------------------------------------------------
-
-For help please take a look at the Spring Integration documentation:
-
-http://www.springsource.org/spring-integration
+Goal of the project is to demonstrate Best Efforts 1PC, as explained by
+Dave Syer(http://www.javaworld.com/article/2077963/open-source-tools/distributed-transactions-in-spring--with-and-without-xa.html)
 
