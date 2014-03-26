@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:int-jpa="http://www.springframework.org/schema/integration/jpa"
+       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+           http://www.springframework.org/schema/data/jpa
+           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		    http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/integration/jpa
+			http://www.springframework.org/schema/integration/jpa/spring-integration-jpa.xsd
+			http://www.springframework.org/schema/integration/jms
+			http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <jpa:repositories base-package="com.chrisjansen.repository"
+                      entity-manager-factory-ref="entityManagerFactory" transaction-manager-ref="transactionManager"/>
+
+    <import resource="jms-common-context.xml"/>
+
+    <integration:channel id="stdinToJmsoutChannel"/>
+
+    <!-- 1. Write to JMS Queue -->
+    <jms:outbound-channel-adapter id="jmsOut" channel="stdinToJmsoutChannel" destination="localQueue" />
+
+    <!-- 2. Listens to JMS queue  -->
+    <int-jms:message-driven-channel-adapter id="jmsIn" destination="localQueue" channel="fromQueueChannel"/>
+
+    <!-- 3. Build a MessageTrack object from the JMS message -->
+    <integration:channel id="fromQueueChannel"/>
+
+    <bean id="messageTrackBuilder" class="com.chrisjansen.service.MessageTrackBuilder"/>
+    <integration:service-activator input-channel="fromQueueChannel" ref="messageTrackBuilder" output-channel="persistMessageChannel"/>
+
+    <!-- 4. Persist via JPA (this isnt using Spring Data for persistence -->
+    <integration:channel id="persistMessageChannel">
+        <integration:interceptors>
+            <integration:wire-tap channel="logger" />
+        </integration:interceptors>
+    </integration:channel>
+
+    <integration:logging-channel-adapter id="logger" level="INFO" />
+
+    <int-jpa:outbound-channel-adapter channel="persistMessageChannel" persist-mode="PERSIST"
+                                      entity-manager-factory="entityManagerFactory" />
+
+
+
+
+
+
+
+     <!-- TODO: Infrastructure - move the section below to external context file -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <constructor-arg ref="entityManagerFactory" />
+    </bean>
+
+    <!-- This entity manager will be aliased as 'entityManagerFactory' during the unit test -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="packagesToScan" value="com.chrisjansen.entity"/>
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter">
+                <property name="generateDdl" value="true"/>
+                <property name="database" value="H2"/>
+            </bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="eclipselink.ddl-generation">create-tables</prop>
+                <prop key="eclipselink.ddl-generation.output-mode">database</prop>
+                <prop key="eclipselink.logging.level">INFO</prop>
+                <prop key="eclipselink.weaving">false</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!-- h2 database (local server version) -->
+        <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+              p:driverClassName="org.h2.Driver"
+              p:url="jdbc:h2:tcp://localhost/~/cmjTest"
+              p:username="sa" p:password=""/>
+
+
+</beans>

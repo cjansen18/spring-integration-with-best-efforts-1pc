@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:stream="http://www.springframework.org/schema/integration/stream"
+       xsi:schemaLocation="       http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Common Active MQ infrastructure -->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="vm://localhost"/>
+            </bean>
+        </property>
+        <property name="sessionCacheSize" value="5"/>
+        <property name="cacheProducers" value="false"/>
+    </bean>
+
+    <bean id="localQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="queue.demo"/>
+    </bean>
+</beans>

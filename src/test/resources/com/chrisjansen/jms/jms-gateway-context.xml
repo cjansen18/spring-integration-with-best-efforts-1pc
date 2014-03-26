@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:stream="http://www.springframework.org/schema/integration/stream"
+       xsi:schemaLocation="       http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+		    http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/integration/stream
+			http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+			http://www.springframework.org/schema/integration/jms
+			http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
+
+    <import resource="jms-common-context.xml"/>
+
+    <!-- ***************************** -->
+    <!-- Inbound gateway configuration -->
+    <!-- ***************************** -->
+    <integration:poller id="poller" default="true" fixed-delay="1000"/>
+
+    <context:component-scan base-package="com.chrisjansen"/>
+
+    <!--JMS queue "localQueue to SI channel:demoChannel-->
+    <jms:inbound-gateway id="jmsin"
+                         request-destination="localQueue"
+                         request-channel="capitalizerChannel"/>
+
+    <integration:channel id="capitalizerChannel"/>
+
+    <integration:service-activator input-channel="capitalizerChannel" ref="capitalCaseService"/>
+
+
+    <!-- ****************************** -->
+    <!-- Outbound gateway configuration -->
+    <!-- ****************************** -->
+    <stream:stdin-channel-adapter id="stdin" channel="stdinToJmsoutChannel"/>
+
+    <integration:channel id="stdinToJmsoutChannel"/>
+
+    <!--Send SI message to outbound JMS location-->
+    <jms:outbound-gateway request-channel="stdinToJmsoutChannel"
+                          request-destination="localQueue"
+                          reply-channel="jmsReplyChannel"/>
+
+    <integration:channel id="jmsReplyChannel" />
+
+    <integration:bridge input-channel="jmsReplyChannel" output-channel="queueChannel"/>
+
+    <integration:channel id="queueChannel">
+        <integration:queue />
+    </integration:channel>
+
+
+
+</beans>
