@@ -1,5 +1,4 @@
 Spring Integration - using Best Efforts 1PC transaction control
-JMS Queue -> Database persist
 ================================================================================
 
 Goal of the project is to demonstrate Best Efforts 1PC, as explained by
