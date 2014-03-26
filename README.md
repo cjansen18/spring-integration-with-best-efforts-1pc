@@ -6,9 +6,8 @@ Sample application demonstrating [Best Efforts 1PC transaction control](http://w
 JUnits created
 =============
 * JMSGateWayTest - demonstrates both inbound and outbound JMS gateway functionality.  This currently works successfully.
-* JMSQueueToDBTest - message sent to a queue, transformed, and persisted to H2 database.  Currently, the persistence to
-H2 is not working.  This test will be used to demonstrate Best Efforts 1PC transaction control.
-An exception will be thrown during database persistence, causing the message to be rolled back to the JMS queue
+* JMSQueueToDBTest - message sent to a queue, transformed, and persisted to H2 database.
+**This test will be used to demonstrate Best Efforts 1PC transaction control (not yet implemented).  An exception will be thrown during database persistence, causing the message to be rolled back to the JMS queue
 
 Technologies used
 =======
