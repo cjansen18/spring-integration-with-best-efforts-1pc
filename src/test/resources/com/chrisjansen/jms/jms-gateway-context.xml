@@ -16,7 +16,8 @@
 			http://www.springframework.org/schema/integration/jms
 			http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
 
-    <import resource="jms-common-context.xml"/>
+    <import resource="common/jms-common-context.xml"/>
+    <import resource="common/database-common-context.xml"/>
 
     <!-- ***************************** -->
     <!-- Inbound gateway configuration -->
@@ -54,7 +55,4 @@
     <integration:channel id="queueChannel">
         <integration:queue />
     </integration:channel>
-
-
-
 </beans>

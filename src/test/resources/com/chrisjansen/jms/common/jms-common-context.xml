@@ -4,22 +4,26 @@
        xmlns:jms="http://www.springframework.org/schema/integration/jms"
        xmlns:integration="http://www.springframework.org/schema/integration"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:stream="http://www.springframework.org/schema/integration/stream"
        xsi:schemaLocation="       http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- Common Active MQ infrastructure -->
-    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <property name="targetConnectionFactory">
-            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                <property name="brokerURL" value="vm://localhost"/>
-            </bean>
-        </property>
-        <property name="sessionCacheSize" value="5"/>
-        <property name="cacheProducers" value="false"/>
+    <bean id="localQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="localQueue"/>
     </bean>
 
-    <bean id="localQueue" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="queue.demo"/>
-    </bean>
+    <beans profile="MqInMemory">
+        <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+              p:brokerURL="vm://localhost?broker.persistent=true"/>
+    </beans>
+
+    <!-- Note - for local ActiveMQ console, go to http://localhost:8161/admin/queues.jsp.  User:admin, password:admin-->
+    <beans profile="MqLocalServer">
+        <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+              p:brokerURL="tcp://localhost:61616"/>
+    </beans>
+
+
 </beans>

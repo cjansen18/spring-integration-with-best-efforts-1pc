@@ -4,6 +4,7 @@ import com.chrisjansen.entity.MessageTrack;
 import com.chrisjansen.repository.MessageTrackRepository;
 import junit.framework.Assert;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -18,26 +19,39 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
+ *  This integration:
+ *  -----------------
+ *  1. Sends a message to a JMS queue.
+ *  2. Message is send to a transformer
+ *  3. Persists message to a database.
+ *
  * @author Chris Jansen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/com/chrisjansen/jms/jms-adapter-context.xml")
-@ActiveProfiles(profiles = "H2Server")
-@TransactionConfiguration(defaultRollback = false)
-@Transactional
+//@ActiveProfiles(profiles = {"DbLocalServer", "MqLocalServer"})
+//@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
+@ActiveProfiles(profiles = {"DbInMemory", "MqLocalServer"})
 public class JMSQueueToDBTest implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     @Autowired
     private MessageTrackRepository messageTrackRepository;
 
+    @BeforeTransaction
+    public void cleanOutExistingData(){
+           messageTrackRepository.deleteAll();
+    }
+
     @Test
+    @Transactional
     public void runBestEfforts1PC(){
 
         final MessageChannel stdinToJmsoutChannel = applicationContext.getBean("stdinToJmsoutChannel", MessageChannel.class);
@@ -45,10 +59,11 @@ public class JMSQueueToDBTest implements ApplicationContextAware {
         stdinToJmsoutChannel.send(MessageBuilder.withPayload("Random queue message").build());
     }
 
-    @After
-    public void findAllRecords(){
+
+    @AfterTransaction
+    public void findAllRecordsAfterInsert(){
         List<MessageTrack> messageTrackList = messageTrackRepository.findAll();
-        Assert.assertNotNull(messageTrackList);
+        Assert.assertEquals(1, messageTrackList.size());
     }
 
     @Override

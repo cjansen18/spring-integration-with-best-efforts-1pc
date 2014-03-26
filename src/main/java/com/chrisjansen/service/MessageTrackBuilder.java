@@ -1,6 +1,7 @@
 package com.chrisjansen.service;
 
 import com.chrisjansen.entity.MessageTrack;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * @author Chris Jansen

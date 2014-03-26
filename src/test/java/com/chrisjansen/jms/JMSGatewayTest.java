@@ -27,14 +27,25 @@ import org.springframework.integration.Message;
 import org.springframework.integration.MessageChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
+ * This integration
+ *  -----------------
+ * 1. Sends a message to outbound JMS gateway
+ * 2. Msg retrieved by inbound JMS gateway
+ * 3. Message sent to a transformer, where it's char case gets capitalized.
+ * 4. Message is the returned on reply channels to #2 and #1 above.
+ *
  * @author Chris Jansen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/com/chrisjansen/jms/jms-gateway-context.xml")
+//@ActiveProfiles(profiles = {"DbLocalServer", "MqLocalServer"})
+//@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
+@ActiveProfiles(profiles = {"DbInMemory", "MqLocalServer"})
 public class JMSGatewayTest implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
@@ -48,7 +59,7 @@ public class JMSGatewayTest implements ApplicationContextAware {
 
 		final QueueChannel queueChannel = applicationContext.getBean("queueChannel", QueueChannel.class);
 
-        Message<String> reply = (Message<String>) queueChannel.receive(30000);
+        Message<String> reply = (Message<String>) queueChannel.receive(60000);
 		Assert.assertNotNull(reply);
 
 		String out = reply.getPayload();
