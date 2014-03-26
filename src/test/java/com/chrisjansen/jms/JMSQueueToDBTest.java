@@ -38,7 +38,7 @@ import java.util.List;
 @ContextConfiguration("classpath:/com/chrisjansen/jms/jms-adapter-context.xml")
 //@ActiveProfiles(profiles = {"DbLocalServer", "MqLocalServer"})
 //@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
-@ActiveProfiles(profiles = {"DbInMemory", "MqLocalServer"})
+@ActiveProfiles(profiles = {"DbLocalServer", "MqInMemory"})
 public class JMSQueueToDBTest implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
