@@ -3,6 +3,7 @@ package com.chrisjansen.jms;
 import com.chrisjansen.entity.MessageTrack;
 import com.chrisjansen.repository.MessageTrackRepository;
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +39,11 @@ import java.util.List;
 @ContextConfiguration("classpath:/com/chrisjansen/jms/jms-adapter-context.xml")
 //@ActiveProfiles(profiles = {"DbLocalServer", "MqLocalServer"})
 //@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
-@ActiveProfiles(profiles = {"DbLocalServer", "MqInMemory"})
+@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
 public class JMSQueueToDBTest implements ApplicationContextAware {
+
+    private final static Logger logger = Logger.getLogger(JMSQueueToDBTest.class.getName());
+
     private static ApplicationContext applicationContext;
 
     @Autowired
@@ -52,7 +56,8 @@ public class JMSQueueToDBTest implements ApplicationContextAware {
 
     @Test
     @Transactional
-    public void runBestEfforts1PC(){
+    @Rollback(false)
+    public void runBestEfforts1PC()  {
 
         final MessageChannel stdinToJmsoutChannel = applicationContext.getBean("stdinToJmsoutChannel", MessageChannel.class);
 
@@ -60,8 +65,12 @@ public class JMSQueueToDBTest implements ApplicationContextAware {
     }
 
 
-    @AfterTransaction
-    public void findAllRecordsAfterInsert(){
+    @After
+    public void findAllRecordsAfterInsert() throws InterruptedException{
+        //sleep for 2 seconds - to let process complete
+        logger.debug("Preparing to sleep for 2 seconds...to let the Integration complete!");
+        Thread.sleep(2000);
+
         List<MessageTrack> messageTrackList = messageTrackRepository.findAll();
         Assert.assertEquals(1, messageTrackList.size());
     }

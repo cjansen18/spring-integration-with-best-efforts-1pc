@@ -51,20 +51,18 @@
                                             destination="localQueue" channel="fromQueueChannel"
                                             acknowledge="transacted" transaction-manager="transactionManager"/>
 
-    <!-- 3. Build a MessageTrack object from the JMS message -->
-    <integration:channel id="fromQueueChannel"/>
-
-    <bean id="messageTrackBuilder" class="com.chrisjansen.service.MessageTrackBuilder"/>
-    <integration:service-activator input-channel="fromQueueChannel" ref="messageTrackBuilder" output-channel="persistRecordChannel"/>
-
-    <!-- 3a. Perform some logging... -->
-    <integration:channel id="persistMessageChannel">
+    <!-- 2a. Perform some logging... -->
+    <integration:channel id="fromQueueChannel">
         <integration:interceptors>
             <integration:wire-tap channel="logger" />
         </integration:interceptors>
     </integration:channel>
 
     <integration:logging-channel-adapter id="logger" level="INFO" />
+
+    <!-- 3. Build a MessageTrack object from the JMS message -->
+    <bean id="messageTrackBuilder" class="com.chrisjansen.service.MessageTrackBuilder"/>
+    <integration:service-activator input-channel="fromQueueChannel" ref="messageTrackBuilder" output-channel="persistRecordChannel"/>
 
     <!-- 4. Persist via JPA (this isnt using Spring Data for persistence -->
     <integration:channel id="persistRecordChannel"/>

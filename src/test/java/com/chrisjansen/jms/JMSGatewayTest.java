@@ -17,6 +17,7 @@ package com.chrisjansen.jms;
 
 import com.chrisjansen.repository.MessageTrackRepository;
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -47,6 +48,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 //@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
 @ActiveProfiles(profiles = {"DbInMemory", "MqLocalServer"})
 public class JMSGatewayTest implements ApplicationContextAware {
+
+    private final static Logger logger = Logger.getLogger(JMSGatewayTest.class.getName());
 
     private static ApplicationContext applicationContext;
 
