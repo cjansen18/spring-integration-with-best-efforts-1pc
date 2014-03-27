@@ -19,4 +19,4 @@ Technologies used
 
 To Do's
 =======
-* Need to be able to emulate/test a deadlock scenario on database side.
+* Implement Control Bus feature to shutdown inbound message processing when needed.
