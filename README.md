@@ -19,4 +19,3 @@ Technologies used
 
 To Do's
 =======
-* Implement Control Bus feature to shutdown inbound message processing when needed.
