@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.chrisjansen.jms;
+package com.chrisjansen.jms.gateway;
 
-import com.chrisjansen.repository.MessageTrackRepository;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.integration.Message;
@@ -43,7 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Chris Jansen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/com/chrisjansen/jms/jms-gateway-context.xml")
+@ContextConfiguration("classpath:/com/chrisjansen/jms/gateway/jms-gateway-context.xml")
 //@ActiveProfiles(profiles = {"DbLocalServer", "MqLocalServer"})
 //@ActiveProfiles(profiles = {"DbInMemory", "MqInMemory"})
 @ActiveProfiles(profiles = {"DbInMemory", "MqLocalServer"})
@@ -52,6 +50,7 @@ public class JMSGatewayTest implements ApplicationContextAware {
     private final static Logger logger = Logger.getLogger(JMSGatewayTest.class.getName());
 
     private static ApplicationContext applicationContext;
+
 
 	@Test
 	public void testGatewayDemo() throws InterruptedException {
